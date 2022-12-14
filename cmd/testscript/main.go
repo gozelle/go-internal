@@ -15,15 +15,15 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/rogpeppe/go-internal/goproxytest"
-	"github.com/rogpeppe/go-internal/gotooltest"
-	"github.com/rogpeppe/go-internal/testscript"
-	"github.com/rogpeppe/go-internal/txtar"
+	"github.com/gozelle/go-internal/goproxytest"
+	"github.com/gozelle/go-internal/gotooltest"
+	"github.com/gozelle/go-internal/testscript"
+	"github.com/gozelle/go-internal/txtar"
 )
 
 const (
 	// goModProxyDir is the special subdirectory in a txtar script's supporting files
-	// within which we expect to find github.com/rogpeppe/go-internal/goproxytest
+	// within which we expect to find github.com/gozelle/go-internal/goproxytest
 	// directories.
 	goModProxyDir = ".gomodproxy"
 )

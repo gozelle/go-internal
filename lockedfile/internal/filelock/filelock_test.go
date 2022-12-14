@@ -15,8 +15,8 @@ import (
 	"runtime"
 	"testing"
 	"time"
-
-	"github.com/rogpeppe/go-internal/lockedfile/internal/filelock"
+	
+	"github.com/gozelle/go-internal/lockedfile/internal/filelock"
 )
 
 func lock(t *testing.T, f *os.File) {
@@ -48,14 +48,14 @@ func unlock(t *testing.T, f *os.File) {
 
 func mustTempFile(t *testing.T) (f *os.File, remove func()) {
 	t.Helper()
-
+	
 	base := filepath.Base(t.Name())
 	f, err := os.CreateTemp("", base)
 	if err != nil {
 		t.Fatalf(`os.CreateTemp("", %q) = %v`, base, err)
 	}
 	t.Logf("fd %d = %s", f.Fd(), f.Name())
-
+	
 	return f, func() {
 		f.Close()
 		os.Remove(f.Name())
@@ -64,12 +64,12 @@ func mustTempFile(t *testing.T) (f *os.File, remove func()) {
 
 func mustOpen(t *testing.T, name string) *os.File {
 	t.Helper()
-
+	
 	f, err := os.OpenFile(name, os.O_RDWR, 0)
 	if err != nil {
 		t.Fatalf("os.Open(%q) = %v", name, err)
 	}
-
+	
 	t.Logf("fd %d = os.Open(%q)", f.Fd(), name)
 	return f
 }
@@ -81,9 +81,9 @@ const (
 
 func mustBlock(t *testing.T, op string, f *os.File) (wait func(*testing.T)) {
 	t.Helper()
-
+	
 	desc := fmt.Sprintf("%s(fd %d)", op, f.Fd())
-
+	
 	done := make(chan struct{})
 	go func() {
 		t.Helper()
@@ -97,12 +97,12 @@ func mustBlock(t *testing.T, op string, f *os.File) (wait func(*testing.T)) {
 		}
 		close(done)
 	}()
-
+	
 	select {
 	case <-done:
 		t.Fatalf("%s unexpectedly did not block", desc)
 		return nil
-
+	
 	case <-time.After(quiescent):
 		t.Logf("%s is blocked (as expected)", desc)
 		return func(t *testing.T) {
@@ -118,13 +118,13 @@ func mustBlock(t *testing.T, op string, f *os.File) (wait func(*testing.T)) {
 
 func TestLockExcludesLock(t *testing.T) {
 	t.Parallel()
-
+	
 	f, remove := mustTempFile(t)
 	defer remove()
-
+	
 	other := mustOpen(t, f.Name())
 	defer other.Close()
-
+	
 	lock(t, f)
 	lockOther := mustBlock(t, "Lock", other)
 	unlock(t, f)
@@ -134,13 +134,13 @@ func TestLockExcludesLock(t *testing.T) {
 
 func TestLockExcludesRLock(t *testing.T) {
 	t.Parallel()
-
+	
 	f, remove := mustTempFile(t)
 	defer remove()
-
+	
 	other := mustOpen(t, f.Name())
 	defer other.Close()
-
+	
 	lock(t, f)
 	rLockOther := mustBlock(t, "RLock", other)
 	unlock(t, f)
@@ -150,14 +150,14 @@ func TestLockExcludesRLock(t *testing.T) {
 
 func TestRLockExcludesOnlyLock(t *testing.T) {
 	t.Parallel()
-
+	
 	f, remove := mustTempFile(t)
 	defer remove()
 	rLock(t, f)
-
+	
 	f2 := mustOpen(t, f.Name())
 	defer f2.Close()
-
+	
 	doUnlockTF := false
 	switch runtime.GOOS {
 	case "aix", "solaris":
@@ -172,11 +172,11 @@ func TestRLockExcludesOnlyLock(t *testing.T) {
 		rLock(t, f2)
 		doUnlockTF = true
 	}
-
+	
 	other := mustOpen(t, f.Name())
 	defer other.Close()
 	lockOther := mustBlock(t, "Lock", other)
-
+	
 	unlock(t, f2)
 	if doUnlockTF {
 		unlock(t, f)
@@ -188,12 +188,12 @@ func TestRLockExcludesOnlyLock(t *testing.T) {
 func TestLockNotDroppedByExecCommand(t *testing.T) {
 	f, remove := mustTempFile(t)
 	defer remove()
-
+	
 	lock(t, f)
-
+	
 	other := mustOpen(t, f.Name())
 	defer other.Close()
-
+	
 	// Some kinds of file locks are dropped when a duplicated or forked file
 	// descriptor is unlocked. Double-check that the approach used by os/exec does
 	// not accidentally drop locks.
@@ -201,7 +201,7 @@ func TestLockNotDroppedByExecCommand(t *testing.T) {
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("exec failed: %v", err)
 	}
-
+	
 	lockOther := mustBlock(t, "Lock", other)
 	unlock(t, f)
 	lockOther(t)

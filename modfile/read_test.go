@@ -14,7 +14,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rogpeppe/go-internal/internal/textutil"
+	"github.com/gozelle/go-internal/internal/textutil"
 )
 
 // exists reports whether the named file exists.

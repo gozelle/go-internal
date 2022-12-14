@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/rogpeppe/go-internal/testenv"
+	"github.com/gozelle/go-internal/testenv"
 )
 
 func TestScan(t *testing.T) {

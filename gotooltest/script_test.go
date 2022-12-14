@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/rogpeppe/go-internal/gotooltest"
-	"github.com/rogpeppe/go-internal/testscript"
+	"github.com/gozelle/go-internal/gotooltest"
+	"github.com/gozelle/go-internal/testscript"
 )
 
 func TestSimple(t *testing.T) {

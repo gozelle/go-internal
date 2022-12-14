@@ -15,8 +15,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
-
-	"github.com/rogpeppe/go-internal/lockedfile"
+	
+	"github.com/gozelle/go-internal/lockedfile"
 )
 
 func isPowerOf2(x int) bool {
@@ -39,7 +39,7 @@ func TestTransform(t *testing.T) {
 	dir, remove := mustTempDir(t)
 	defer remove()
 	path := filepath.Join(dir, "blob.bin")
-
+	
 	const maxChunkWords = 8 << 10
 	buf := make([]byte, 2*maxChunkWords*8)
 	for i := uint64(0); i < 2*maxChunkWords; i++ {
@@ -48,38 +48,38 @@ func TestTransform(t *testing.T) {
 	if err := lockedfile.Write(path, bytes.NewReader(buf[:8]), 0666); err != nil {
 		t.Fatal(err)
 	}
-
+	
 	var attempts int64 = 128
 	if !testing.Short() {
 		attempts *= 16
 	}
 	const parallel = 32
-
+	
 	var sem = make(chan bool, parallel)
-
+	
 	for n := attempts; n > 0; n-- {
 		sem <- true
 		go func() {
 			defer func() { <-sem }()
-
+			
 			time.Sleep(time.Duration(rand.Intn(100)) * time.Microsecond)
 			chunkWords := roundDownToPowerOf2(rand.Intn(maxChunkWords) + 1)
 			offset := rand.Intn(chunkWords)
-
+			
 			err := lockedfile.Transform(path, func(data []byte) (chunk []byte, err error) {
 				chunk = buf[offset*8 : (offset+chunkWords)*8]
-
+				
 				if len(data)&^7 != len(data) {
 					t.Errorf("read %d bytes, but each write is an integer multiple of 8 bytes", len(data))
 					return chunk, nil
 				}
-
+				
 				words := len(data) / 8
 				if !isPowerOf2(words) {
 					t.Errorf("read %d 8-byte words, but each write is a power-of-2 number of words", words)
 					return chunk, nil
 				}
-
+				
 				u := binary.LittleEndian.Uint64(data)
 				for i := 1; i < words; i++ {
 					next := binary.LittleEndian.Uint64(data[i*8:])
@@ -89,16 +89,16 @@ func TestTransform(t *testing.T) {
 					}
 					u = next
 				}
-
+				
 				return chunk, nil
 			})
-
+			
 			if err != nil {
 				t.Errorf("unexpected error from Transform: %v", err)
 			}
 		}()
 	}
-
+	
 	for n := parallel; n > 0; n-- {
 		sem <- true
 	}

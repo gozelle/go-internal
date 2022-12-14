@@ -34,10 +34,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rogpeppe/go-internal/module"
-	"github.com/rogpeppe/go-internal/par"
-	"github.com/rogpeppe/go-internal/semver"
-	"github.com/rogpeppe/go-internal/txtar"
+	"github.com/gozelle/go-internal/module"
+	"github.com/gozelle/go-internal/par"
+	"github.com/gozelle/go-internal/semver"
+	"github.com/gozelle/go-internal/txtar"
 )
 
 type Server struct {

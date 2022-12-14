@@ -8,7 +8,7 @@
 //
 //	txtar-x [-C root-dir] saved.txt
 //
-// See https://godoc.org/github.com/rogpeppe/go-internal/txtar for details of the format
+// See https://godoc.org/github.com/gozelle/go-internal/txtar for details of the format
 // and how to parse a txtar file.
 //
 package main
@@ -20,7 +20,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/rogpeppe/go-internal/txtar"
+	"github.com/gozelle/go-internal/txtar"
 )
 
 var (

@@ -1,10 +1,10 @@
 unquote scripts/exec.txt
 
-[darwin] skip 'Pending a fix for github.com/rogpeppe/go-internal/issues/130'
+[darwin] skip 'Pending a fix for github.com/gozelle/go-internal/issues/130'
 
 # The module uses testscript itself.
 # Use the checked out module, based on where the test binary ran.
-go mod edit -replace=github.com/rogpeppe/go-internal=${GOINTERNAL_MODULE}
+go mod edit -replace=github.com/gozelle/go-internal=${GOINTERNAL_MODULE}
 go mod tidy
 
 # First, a 'go test' run without coverage.
@@ -52,8 +52,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rogpeppe/go-internal/gotooltest"
-	"github.com/rogpeppe/go-internal/testscript"
+	"github.com/gozelle/go-internal/gotooltest"
+	"github.com/gozelle/go-internal/testscript"
 )
 
 func TestMain(m *testing.M) {

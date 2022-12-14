@@ -10,7 +10,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rogpeppe/go-internal/testscript"
+	"github.com/gozelle/go-internal/testscript"
 )
 
 func TestMain(m *testing.M) {

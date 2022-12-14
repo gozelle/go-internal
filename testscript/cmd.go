@@ -15,9 +15,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
+	
+	"github.com/gozelle/go-internal/txtar"
 	"github.com/pkg/diff"
-	"github.com/rogpeppe/go-internal/txtar"
 )
 
 // scriptCmds are the script command implementations.
@@ -56,7 +56,7 @@ func (ts *TestScript) cmdCd(neg bool, args []string) {
 	if len(args) != 1 {
 		ts.Fatalf("usage: cd dir")
 	}
-
+	
 	dir := args[0]
 	if !filepath.IsAbs(dir) {
 		dir = filepath.Join(ts.cd, dir)
@@ -99,7 +99,7 @@ func (ts *TestScript) cmdCmp(neg bool, args []string) {
 	if len(args) != 2 {
 		ts.Fatalf("usage: cmp file1 file2")
 	}
-
+	
 	ts.doCmdCmp(neg, args, false)
 }
 
@@ -114,7 +114,7 @@ func (ts *TestScript) cmdCmpenv(neg bool, args []string) {
 func (ts *TestScript) doCmdCmp(neg bool, args []string, env bool) {
 	name1, name2 := args[0], args[1]
 	text1 := ts.ReadFile(name1)
-
+	
 	absName2 := ts.MkAbs(name2)
 	data, err := ioutil.ReadFile(absName2)
 	ts.Check(err)
@@ -140,7 +140,7 @@ func (ts *TestScript) doCmdCmp(neg bool, args []string, env bool) {
 		// The file being compared against isn't in the txtar archive, so don't
 		// update the script.
 	}
-
+	
 	// pkg/diff is quadratic at the moment.
 	// If the product of the number of lines in the inputs is too large,
 	// don't call pkg.Diff at all as it might take tons of memory or time.
@@ -150,12 +150,12 @@ func (ts *TestScript) doCmdCmp(neg bool, args []string, env bool) {
 		ts.Fatalf("large files %s and %s differ", name1, name2)
 		return
 	}
-
+	
 	var sb strings.Builder
 	if err := diff.Text(name1, name2, text1, text2, &sb); err != nil {
 		ts.Check(err)
 	}
-
+	
 	ts.Logf("%s", sb.String())
 	ts.Fatalf("%s and %s differ", name1, name2)
 }
@@ -168,14 +168,14 @@ func (ts *TestScript) cmdCp(neg bool, args []string) {
 	if len(args) < 2 {
 		ts.Fatalf("usage: cp src... dst")
 	}
-
+	
 	dst := ts.MkAbs(args[len(args)-1])
 	info, err := os.Stat(dst)
 	dstDir := err == nil && info.IsDir()
 	if len(args) > 2 && !dstDir {
 		ts.Fatalf("cp: destination %s is not a directory", dst)
 	}
-
+	
 	for _, arg := range args[:len(args)-1] {
 		var (
 			src  string
@@ -241,7 +241,7 @@ func (ts *TestScript) cmdExec(neg bool, args []string) {
 	if len(args) < 1 || (len(args) == 1 && args[0] == "&") {
 		ts.Fatalf("usage: exec program [args...] [&]")
 	}
-
+	
 	var err error
 	if len(args) > 0 && backgroundSpecifier.MatchString(args[len(args)-1]) {
 		bgName := strings.TrimSuffix(strings.TrimPrefix(args[len(args)-1], "&"), "&")
@@ -271,7 +271,7 @@ func (ts *TestScript) cmdExec(neg bool, args []string) {
 			ts.Fatalf("unexpected command success")
 		}
 	}
-
+	
 	if err != nil {
 		fmt.Fprintf(&ts.log, "[%v]\n", err)
 		if ts.ctxt.Err() != nil {
@@ -292,7 +292,7 @@ func (ts *TestScript) cmdExists(neg bool, args []string) {
 	if len(args) == 0 {
 		ts.Fatalf("usage: exists [-readonly] file...")
 	}
-
+	
 	for _, file := range args {
 		file = ts.MkAbs(file)
 		info, err := os.Stat(file)
@@ -374,14 +374,14 @@ func (ts *TestScript) cmdSkip(neg bool, args []string) {
 	if neg {
 		ts.Fatalf("unsupported: ! skip")
 	}
-
+	
 	// Before we mark the test as skipped, shut down any background processes and
 	// make sure they have returned the correct status.
 	for _, bg := range ts.background {
 		interruptProcess(bg.cmd.Process)
 	}
 	ts.cmdWait(false, nil)
-
+	
 	if len(args) == 1 {
 		ts.t.Skip(args[0])
 	}
@@ -531,22 +531,22 @@ func (ts *TestScript) waitBackground(checkStatus bool) {
 	var stdouts, stderrs []string
 	for _, bg := range ts.background {
 		<-bg.wait
-
+		
 		args := append([]string{filepath.Base(bg.cmd.Args[0])}, bg.cmd.Args[1:]...)
 		fmt.Fprintf(&ts.log, "[background] %s: %v\n", strings.Join(args, " "), bg.cmd.ProcessState)
-
+		
 		cmdStdout := bg.cmd.Stdout.(*strings.Builder).String()
 		if cmdStdout != "" {
 			fmt.Fprintf(&ts.log, "[stdout]\n%s", cmdStdout)
 			stdouts = append(stdouts, cmdStdout)
 		}
-
+		
 		cmdStderr := bg.cmd.Stderr.(*strings.Builder).String()
 		if cmdStderr != "" {
 			fmt.Fprintf(&ts.log, "[stderr]\n%s", cmdStderr)
 			stderrs = append(stderrs, cmdStderr)
 		}
-
+		
 		if !checkStatus {
 			continue
 		}
@@ -562,7 +562,7 @@ func (ts *TestScript) waitBackground(checkStatus bool) {
 			}
 		}
 	}
-
+	
 	ts.stdout = strings.Join(stdouts, "")
 	ts.stderr = strings.Join(stderrs, "")
 	ts.background = nil
@@ -585,7 +585,7 @@ func scriptMatch(ts *TestScript, neg bool, args []string, text, name string) {
 		}
 		args = args[1:]
 	}
-
+	
 	extraUsage := ""
 	want := 1
 	if name == "grep" {
@@ -595,11 +595,11 @@ func scriptMatch(ts *TestScript, neg bool, args []string, text, name string) {
 	if len(args) != want {
 		ts.Fatalf("usage: %s [-count=N] 'pattern'%s", name, extraUsage)
 	}
-
+	
 	pattern := args[0]
 	re, err := regexp.Compile(`(?m)` + pattern)
 	ts.Check(err)
-
+	
 	isGrep := name == "grep"
 	if isGrep {
 		name = args[1] // for error messages
@@ -607,7 +607,7 @@ func scriptMatch(ts *TestScript, neg bool, args []string, text, name string) {
 		ts.Check(err)
 		text = string(data)
 	}
-
+	
 	if neg {
 		if re.MatchString(text) {
 			if isGrep {

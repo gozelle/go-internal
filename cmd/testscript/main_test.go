@@ -12,10 +12,10 @@ import (
 	"runtime"
 	"strings"
 	"testing"
-
-	"github.com/rogpeppe/go-internal/gotooltest"
-	"github.com/rogpeppe/go-internal/internal/os/execpath"
-	"github.com/rogpeppe/go-internal/testscript"
+	
+	"github.com/gozelle/go-internal/gotooltest"
+	"github.com/gozelle/go-internal/internal/os/execpath"
+	"github.com/gozelle/go-internal/testscript"
 )
 
 func TestMain(m *testing.M) {
@@ -28,7 +28,7 @@ func TestScripts(t *testing.T) {
 	if _, err := exec.LookPath("go"); err != nil {
 		t.Fatalf("need go in PATH for these tests")
 	}
-
+	
 	var stderr bytes.Buffer
 	cmd := exec.Command("go", "env", "GOMOD")
 	cmd.Stderr = &stderr
@@ -37,11 +37,11 @@ func TestScripts(t *testing.T) {
 		t.Fatalf("failed to run %v: %v\n%s", strings.Join(cmd.Args, " "), err, stderr.String())
 	}
 	gomod := string(out)
-
+	
 	if gomod == "" {
 		t.Fatalf("apparently we are not running in module mode?")
 	}
-
+	
 	p := testscript.Params{
 		Dir: "testdata",
 		Setup: func(env *testscript.Env) error {

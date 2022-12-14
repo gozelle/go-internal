@@ -10,8 +10,8 @@ package filelock
 import (
 	"io/fs"
 	"syscall"
-
-	"github.com/rogpeppe/go-internal/internal/syscall/windows"
+	
+	"github.com/gozelle/go-internal/internal/syscall/windows"
 )
 
 type lockType uint32
@@ -33,7 +33,7 @@ func lock(f File, lt lockType) error {
 	// which contains the file offset of the beginning of the lock range.
 	// We want to lock the entire file, so we leave the offset as zero.
 	ol := new(syscall.Overlapped)
-
+	
 	err := windows.LockFileEx(syscall.Handle(f.Fd()), uint32(lt), reserved, allBytes, allBytes, ol)
 	if err != nil {
 		return &fs.PathError{

@@ -24,11 +24,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rogpeppe/go-internal/imports"
-	"github.com/rogpeppe/go-internal/internal/os/execpath"
-	"github.com/rogpeppe/go-internal/par"
-	"github.com/rogpeppe/go-internal/testenv"
-	"github.com/rogpeppe/go-internal/txtar"
+	"github.com/gozelle/go-internal/imports"
+	"github.com/gozelle/go-internal/internal/os/execpath"
+	"github.com/gozelle/go-internal/par"
+	"github.com/gozelle/go-internal/testenv"
+	"github.com/gozelle/go-internal/txtar"
 )
 
 var goVersionRegex = regexp.MustCompile(`^go([1-9][0-9]*)\.([1-9][0-9]*)$`)

@@ -7,8 +7,8 @@ package goproxytest
 import (
 	"regexp"
 	"strings"
-
-	"github.com/rogpeppe/go-internal/semver"
+	
+	"github.com/gozelle/go-internal/semver"
 )
 
 // This code was taken from cmd/go/internal/modfetch/pseudo.go

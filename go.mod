@@ -1,4 +1,4 @@
-module github.com/rogpeppe/go-internal
+module github.com/gozelle/go-internal
 
 go 1.17
 

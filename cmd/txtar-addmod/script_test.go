@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"os"
 	"testing"
-
-	"github.com/rogpeppe/go-internal/goproxytest"
-	"github.com/rogpeppe/go-internal/gotooltest"
-	"github.com/rogpeppe/go-internal/testscript"
+	
+	"github.com/gozelle/go-internal/goproxytest"
+	"github.com/gozelle/go-internal/gotooltest"
+	"github.com/gozelle/go-internal/testscript"
 )
 
 var proxyURL string
@@ -34,7 +34,7 @@ func (m gobinMain) Run() int {
 		return 1
 	}
 	proxyURL = srv.URL
-
+	
 	return m.m.Run()
 }
 
